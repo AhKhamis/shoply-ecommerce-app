@@ -30,6 +30,11 @@ environment:
 dependencies:
   flutter:
     sdk: flutter
+  intl_phone_field: ^3.1.0
+  country_picker: ^2.0.20
+  intl: ^0.18.1
+  geolocator: ^11.0.0
+  geocoding: ^3.0.0
 
 
   # The following adds the Cupertino Icons font to your application.
@@ -65,6 +70,42 @@ flutter:
     - assets/2.png
     - assets/3.png
     - assets/4.png
+    - assets/facebook.png
+    - assets/google.png
+    - assets/apple.png
+    - assets/confirmed.png
+    - assets/shopbackground1.png
+    - assets/shopbackground2.png
+    - assets/shopbackground3.png
+    - assets/shopbackground4.png
+    - assets/shopbackground5.png
+    - assets/shop1.png
+    - assets/shop2.png
+    - assets/shop3.png
+    - assets/shop4.png
+    - assets/shop5.png
+    - assets/product1.png
+    - assets/product2.png
+    - assets/product3.png
+    - assets/product4.png
+    - assets/product5.png
+    - assets/product6.png
+    - assets/product7.png
+    - assets/product8.png
+    - assets/product9.png
+    - assets/product10.png
+    - assets/product11.png
+    - assets/product12.png
+    - assets/product13.png
+    - assets/product14.png
+    - assets/product15.png
+    - assets/applepay.png
+    - assets/benefitpay.png
+    - assets/cash.png
+    - assets/visa.png
+    - assets/mastercard.png
+    - assets/bro.png
+
 
 
   # An image asset can refer to one or more resolution-specific "variants", see

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shoply/home_screen/home_screen.dart';
+import 'package:shoply/registration/signin_page.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
@@ -46,7 +46,7 @@ class _WelcomePageState extends State<WelcomePage> {
     } else {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const HomeScreen()),
+        MaterialPageRoute(builder: (context) => const SigninPage()),
       );
     }
   }
@@ -54,7 +54,7 @@ class _WelcomePageState extends State<WelcomePage> {
   void skip() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const HomeScreen()),
+      MaterialPageRoute(builder: (context) => const SigninPage()),
     );
   }
 
@@ -136,76 +136,51 @@ class _WelcomePageState extends State<WelcomePage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 24.0),
                   child: Row(
-                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
                       if (currentPage != pages.length - 1)
-                        ElevatedButton(
-                          onPressed: skip,
-                          style: ElevatedButton.styleFrom(
-                            padding: const EdgeInsets.symmetric(
-                              horizontal: 32,
-                              vertical: 18, // Increase height
-                            ),
-                            backgroundColor: Colors.grey.shade300,
-                            shape: RoundedRectangleBorder(
-                              borderRadius: BorderRadius.circular(8),
+                        if (currentPage != pages.length - 1)
+                          Expanded(
+                            child: TextButton(
+                              onPressed: skip,
+                              style: TextButton.styleFrom(
+                                padding:
+                                    const EdgeInsets.symmetric(vertical: 18),
+                                foregroundColor: Colors.black, // Text color
+                              ),
+                              child: const Text(
+                                "Skip",
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                             ),
                           ),
-                          child: const Text(
-                            "Skip",
-                            style: TextStyle(
-                              fontSize: 16,
-                              color: Colors.black,
-                            ),
-                          ),
-                        ),
-                      if (currentPage != pages.length - 1)
-                        AnimatedContainer(
-                          duration: const Duration(milliseconds: 300),
-                          width: currentPage != pages.length - 1
-                              ? 120
-                              : 0, // Adjust width for transition
-                          height: 50, // Increased height
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: AnimatedContainer(
+                          duration: const Duration(
+                              milliseconds: 800), // Slower animation
+                          curve: Curves.easeInOut, // Smooth easing curve
+                          height: 50, // Fixed height for all buttons
                           child: ElevatedButton(
                             onPressed: navigateToNextPage,
                             style: ElevatedButton.styleFrom(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 16,
-                              ),
+                              padding: const EdgeInsets.symmetric(vertical: 16),
                               backgroundColor: const Color(0xFF267093),
                               shape: RoundedRectangleBorder(
                                 borderRadius: BorderRadius.circular(8),
                               ),
                             ),
-                            child: const Text(
-                              "Next",
-                              style: TextStyle(color: Colors.white),
+                            child: Text(
+                              currentPage == pages.length - 1
+                                  ? "Get Started"
+                                  : "Next",
+                              style: const TextStyle(color: Colors.white),
                             ),
                           ),
                         ),
-                      if (currentPage == pages.length - 1)
-                        Expanded(
-                          child: AnimatedContainer(
-                            duration: const Duration(milliseconds: 300),
-                            height: 50, // Increased height
-                            child: ElevatedButton(
-                              onPressed: navigateToNextPage,
-                              style: ElevatedButton.styleFrom(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 16,
-                                ),
-                                backgroundColor: const Color(0xFF267093),
-                                shape: RoundedRectangleBorder(
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                              ),
-                              child: const Text(
-                                "Get Started",
-                                style: TextStyle(color: Colors.white),
-                              ),
-                            ),
-                          ),
-                        ),
+                      ),
                     ],
                   ),
                 ),
