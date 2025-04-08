@@ -11,6 +11,8 @@ class SearchPage extends StatefulWidget {
 
 class _SearchPageState extends State<SearchPage> {
   String selectedCategory = 'All'; // Default selected category
+  String searchQuery = ''; // Search query state
+  final TextEditingController searchController = TextEditingController();
 
   final List<String> categories = [
     'All',
@@ -23,12 +25,15 @@ class _SearchPageState extends State<SearchPage> {
 
   @override
   Widget build(BuildContext context) {
-    // ✅ Filtered Shops Based on Category Selection
+    // ✅ Filtered Shops Based on Category Selection & Search Query
     List<Shop> filteredShops = selectedCategory == 'All'
-        ? shops
+        ? shops.where((shop) {
+            return shop.name.toLowerCase().contains(searchQuery.toLowerCase());
+          }).toList()
         : shops.where((shop) {
             return shop.products
-                .any((product) => product.category == selectedCategory);
+                    .any((product) => product.category == selectedCategory) &&
+                shop.name.toLowerCase().contains(searchQuery.toLowerCase());
           }).toList();
 
     return Scaffold(
@@ -52,12 +57,29 @@ class _SearchPageState extends State<SearchPage> {
                     ),
                   ],
                 ),
-                child: const TextField(
+                child: TextField(
+                  controller: searchController,
+                  onChanged: (value) {
+                    setState(() {
+                      searchQuery = value;
+                    });
+                  },
                   decoration: InputDecoration(
                     hintText: 'Search...',
-                    prefixIcon: Icon(Icons.search),
+                    prefixIcon: const Icon(Icons.search),
+                    suffixIcon: searchQuery.isNotEmpty
+                        ? GestureDetector(
+                            onTap: () {
+                              setState(() {
+                                searchController.clear();
+                                searchQuery = '';
+                              });
+                            },
+                            child: const Icon(Icons.clear),
+                          )
+                        : null,
                     border: InputBorder.none,
-                    contentPadding: EdgeInsets.symmetric(vertical: 14),
+                    contentPadding: const EdgeInsets.symmetric(vertical: 14),
                   ),
                 ),
               ),

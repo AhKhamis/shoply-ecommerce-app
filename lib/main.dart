@@ -2,6 +2,11 @@ import 'package:flutter/material.dart';
 import 'package:shoply/app_pages/home_page.dart';
 import 'package:shoply/app_pages/search_page.dart';
 import 'package:shoply/app_pages/orders_page.dart';
+import 'package:shoply/app_pages/admin_page/admin_users_page.dart';
+import 'package:shoply/app_pages/admin_page/admin_shops_page.dart';
+import 'package:shoply/app_pages/admin_page/admin_create_shop_page.dart';
+import 'package:shoply/registration/admin_pass_page.dart';
+import 'package:shoply/app_pages/shop_pages/shop_interface_page.dart';
 
 void main() {
   runApp(const MyApp());
@@ -18,7 +23,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: const MainPage(),
+      home: AdminPassPage(),
       debugShowCheckedModeBanner: false,
     );
   }
