@@ -36,6 +36,12 @@ dependencies:
   geolocator: ^11.0.0
   geocoding: ^3.0.0
   image_picker: ^1.0.7 # or the latest version available
+  firebase_core: ^3.13.0
+  firebase_auth: ^5.5.2
+  cloud_firestore:
+  firebase_storage:
+  google_sign_in: ^6.1.4
+
 
 
 
