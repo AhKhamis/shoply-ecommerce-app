@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
-import 'signin_page.dart'; // Import the Sign-in page
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
+import 'signin_page.dart';
 
 class SignupPage extends StatefulWidget {
   const SignupPage({super.key});
@@ -12,48 +14,137 @@ class _SignupPageState extends State<SignupPage> {
   bool _obscurePassword = true;
   bool _obscureConfirmPassword = true;
 
-  final FocusNode _fullNameFocusNode = FocusNode();
-  final FocusNode _emailFocusNode = FocusNode();
-  final FocusNode _passwordFocusNode = FocusNode();
-  final FocusNode _confirmPasswordFocusNode = FocusNode();
+  final _auth = FirebaseAuth.instance;
+  final _formKey = GlobalKey<FormState>();
 
-  @override
-  void initState() {
-    super.initState();
-    _fullNameFocusNode.addListener(() {
-      setState(() {});
-    });
-    _emailFocusNode.addListener(() {
-      setState(() {});
-    });
-    _passwordFocusNode.addListener(() {
-      setState(() {});
-    });
-    _confirmPasswordFocusNode.addListener(() {
-      setState(() {});
-    });
-  }
+  final _fullNameController = TextEditingController();
+  final _emailController = TextEditingController();
+  final _passwordController = TextEditingController();
+  final _confirmPasswordController = TextEditingController();
+
+  String? _confirmPasswordError;
 
   @override
   void dispose() {
-    _fullNameFocusNode.dispose();
-    _emailFocusNode.dispose();
-    _passwordFocusNode.dispose();
-    _confirmPasswordFocusNode.dispose();
+    _fullNameController.dispose();
+    _emailController.dispose();
+    _passwordController.dispose();
+    _confirmPasswordController.dispose();
     super.dispose();
+  }
+
+  String? _validateName(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Full name is required';
+    }
+    return null;
+  }
+
+  String? _validateEmail(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Email is required';
+    }
+    final emailRegex = RegExp(r'^[\w-.]+@([\w-]+\.)+[\w-]{2,4}$');
+    if (!emailRegex.hasMatch(value.trim())) {
+      return 'Enter a valid email';
+    }
+    return null;
+  }
+
+  String? _validatePassword(String? value) {
+    if (value == null || value.trim().isEmpty) {
+      return 'Password is required';
+    }
+    if (value.length < 8) {
+      return 'Password must be at least 8 characters';
+    }
+    if (!RegExp(r'[A-Z]').hasMatch(value)) {
+      return 'Include at least one uppercase letter';
+    }
+    if (!RegExp(r'[a-z]').hasMatch(value)) {
+      return 'Include at least one lowercase letter';
+    }
+    if (!RegExp(r'\d').hasMatch(value)) {
+      return 'Include at least one number';
+    }
+    return null;
+  }
+
+  String? _validateConfirmPassword(String? value) {
+    if (value != _passwordController.text) {
+      return 'Passwords do not match';
+    }
+    return null;
+  }
+
+  Future<void> _signUpWithEmail() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    try {
+      await _auth.createUserWithEmailAndPassword(
+        email: _emailController.text.trim(),
+        password: _passwordController.text.trim(),
+      );
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Sign up successful!")),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const SigninPage()),
+      );
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Firebase Error: ${e.message}")),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Error: ${e.toString()}")),
+      );
+    }
+  }
+
+  Future<void> _signInWithGoogle() async {
+    try {
+      final GoogleSignInAccount? googleUser = await GoogleSignIn().signIn();
+      final GoogleSignInAuthentication? googleAuth =
+          await googleUser?.authentication;
+
+      final credential = GoogleAuthProvider.credential(
+        accessToken: googleAuth?.accessToken,
+        idToken: googleAuth?.idToken,
+      );
+
+      await FirebaseAuth.instance.signInWithCredential(credential);
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Signed in with Google!")),
+      );
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (_) => const SigninPage()),
+      );
+    } on FirebaseAuthException catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Firebase Error: ${e.message}")),
+      );
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text("Google Sign-In failed: ${e.toString()}")),
+      );
+    }
   }
 
   @override
   Widget build(BuildContext context) {
-    return StatefulBuilder(
-      builder: (context, setState) {
-        return Scaffold(
-          body: Padding(
-            padding: const EdgeInsets.symmetric(horizontal: 24.0),
+    return Scaffold(
+      body: Padding(
+        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+        child: SingleChildScrollView(
+          child: Form(
+            key: _formKey,
             child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                const SizedBox(height: 60),
                 ShaderMask(
                   shaderCallback: (Rect bounds) {
                     return const LinearGradient(
@@ -77,7 +168,7 @@ class _SignupPageState extends State<SignupPage> {
                   style: TextStyle(
                     fontSize: 20,
                     fontWeight: FontWeight.bold,
-                    color: Color.fromARGB(255, 0, 0, 0),
+                    color: Colors.black,
                   ),
                 ),
                 const SizedBox(height: 8),
@@ -86,135 +177,38 @@ class _SignupPageState extends State<SignupPage> {
                   style: TextStyle(fontSize: 14, color: Colors.grey),
                 ),
                 const SizedBox(height: 32),
-                TextField(
-                  focusNode: _fullNameFocusNode,
-                  decoration: InputDecoration(
-                    contentPadding: const EdgeInsets.symmetric(vertical: 18),
-                    prefixIcon: Icon(
-                      Icons.person_outline,
-                      color: _fullNameFocusNode.hasFocus
-                          ? Colors.black
-                          : Colors.grey,
-                    ),
-                    hintText: 'Full Name',
-                    hintStyle:
-                        const TextStyle(fontSize: 14, color: Colors.grey),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: const BorderSide(color: Colors.grey),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: const BorderSide(color: Colors.black),
-                    ),
-                  ),
-                ),
+                _buildInputField(
+                    hint: "Full Name",
+                    controller: _fullNameController,
+                    icon: Icons.person_outline,
+                    validator: _validateName),
                 const SizedBox(height: 16),
-                TextField(
-                  focusNode: _emailFocusNode,
-                  decoration: InputDecoration(
-                    contentPadding: const EdgeInsets.symmetric(vertical: 18),
-                    prefixIcon: Icon(
-                      Icons.email_outlined,
-                      color:
-                          _emailFocusNode.hasFocus ? Colors.black : Colors.grey,
-                    ),
-                    hintText: 'E-mail',
-                    hintStyle:
-                        const TextStyle(fontSize: 14, color: Colors.grey),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: const BorderSide(color: Colors.grey),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: const BorderSide(color: Colors.black),
-                    ),
-                  ),
-                ),
+                _buildInputField(
+                    hint: "E-mail",
+                    controller: _emailController,
+                    icon: Icons.email_outlined,
+                    validator: _validateEmail),
                 const SizedBox(height: 16),
-                TextField(
-                  obscureText: _obscurePassword,
-                  focusNode: _passwordFocusNode,
-                  decoration: InputDecoration(
-                    contentPadding: const EdgeInsets.symmetric(vertical: 18),
-                    prefixIcon: Icon(
-                      Icons.lock_outline,
-                      color: _passwordFocusNode.hasFocus
-                          ? Colors.black
-                          : Colors.grey,
-                    ),
-                    hintText: 'Password',
-                    hintStyle:
-                        const TextStyle(fontSize: 14, color: Colors.grey),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: const BorderSide(color: Colors.grey),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: const BorderSide(color: Colors.black),
-                    ),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscurePassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                        color: _passwordFocusNode.hasFocus
-                            ? Colors.black
-                            : Colors.grey,
-                      ),
-                      onPressed: () {
-                        setState(() {
+                _buildPasswordInput(
+                    hint: "Password",
+                    controller: _passwordController,
+                    obscure: _obscurePassword,
+                    toggle: () => setState(() {
                           _obscurePassword = !_obscurePassword;
-                        });
-                      },
-                    ),
-                  ),
-                ),
+                        }),
+                    validator: _validatePassword),
                 const SizedBox(height: 16),
-                TextField(
-                  obscureText: _obscureConfirmPassword,
-                  focusNode: _confirmPasswordFocusNode,
-                  decoration: InputDecoration(
-                    contentPadding: const EdgeInsets.symmetric(vertical: 18),
-                    prefixIcon: Icon(
-                      Icons.lock_outline,
-                      color: _confirmPasswordFocusNode.hasFocus
-                          ? Colors.black
-                          : Colors.grey,
-                    ),
-                    hintText: 'Confirm Password',
-                    hintStyle:
-                        const TextStyle(fontSize: 14, color: Colors.grey),
-                    enabledBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: const BorderSide(color: Colors.grey),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderRadius: BorderRadius.circular(8.0),
-                      borderSide: const BorderSide(color: Colors.black),
-                    ),
-                    suffixIcon: IconButton(
-                      icon: Icon(
-                        _obscureConfirmPassword
-                            ? Icons.visibility_off
-                            : Icons.visibility,
-                        color: _confirmPasswordFocusNode.hasFocus
-                            ? Colors.black
-                            : Colors.grey,
-                      ),
-                      onPressed: () {
-                        setState(() {
+                _buildPasswordInput(
+                    hint: "Confirm Password",
+                    controller: _confirmPasswordController,
+                    obscure: _obscureConfirmPassword,
+                    toggle: () => setState(() {
                           _obscureConfirmPassword = !_obscureConfirmPassword;
-                        });
-                      },
-                    ),
-                  ),
-                ),
+                        }),
+                    validator: _validateConfirmPassword),
                 const SizedBox(height: 16),
                 ElevatedButton(
-                  onPressed: () {},
+                  onPressed: _signUpWithEmail,
                   style: ElevatedButton.styleFrom(
                     backgroundColor: const Color(0xFF267093),
                     minimumSize: const Size(double.infinity, 58),
@@ -245,11 +239,20 @@ class _SignupPageState extends State<SignupPage> {
                 Row(
                   mainAxisAlignment: MainAxisAlignment.center,
                   children: [
-                    Image.asset('assets/apple.png', height: 35),
+                    GestureDetector(
+                      onTap: () {}, // Apple sign-in placeholder
+                      child: Image.asset('assets/apple.png', height: 35),
+                    ),
                     const SizedBox(width: 40),
-                    Image.asset('assets/google.png', height: 30),
+                    GestureDetector(
+                      onTap: _signInWithGoogle,
+                      child: Image.asset('assets/google.png', height: 30),
+                    ),
                     const SizedBox(width: 40),
-                    Image.asset('assets/facebook.png', height: 30),
+                    GestureDetector(
+                      onTap: () {}, // Facebook sign-in placeholder
+                      child: Image.asset('assets/facebook.png', height: 30),
+                    ),
                   ],
                 ),
                 const SizedBox(height: 26),
@@ -264,8 +267,7 @@ class _SignupPageState extends State<SignupPage> {
                       onPressed: () {
                         Navigator.push(
                           context,
-                          MaterialPageRoute(
-                              builder: (context) => const SigninPage()),
+                          MaterialPageRoute(builder: (_) => const SigninPage()),
                         );
                       },
                       child: const Text(
@@ -276,11 +278,56 @@ class _SignupPageState extends State<SignupPage> {
                     ),
                   ],
                 ),
+                const SizedBox(height: 40),
               ],
             ),
           ),
-        );
-      },
+        ),
+      ),
+    );
+  }
+
+  Widget _buildInputField({
+    required String hint,
+    required TextEditingController controller,
+    required IconData icon,
+    required String? Function(String?) validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      validator: validator,
+      decoration: InputDecoration(
+        contentPadding: const EdgeInsets.symmetric(vertical: 18),
+        prefixIcon: Icon(icon),
+        hintText: hint,
+        hintStyle: const TextStyle(fontSize: 14, color: Colors.grey),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+      ),
+    );
+  }
+
+  Widget _buildPasswordInput({
+    required String hint,
+    required TextEditingController controller,
+    required bool obscure,
+    required VoidCallback toggle,
+    required String? Function(String?) validator,
+  }) {
+    return TextFormField(
+      controller: controller,
+      obscureText: obscure,
+      validator: validator,
+      decoration: InputDecoration(
+        contentPadding: const EdgeInsets.symmetric(vertical: 18),
+        prefixIcon: const Icon(Icons.lock_outline),
+        hintText: hint,
+        hintStyle: const TextStyle(fontSize: 14, color: Colors.grey),
+        border: OutlineInputBorder(borderRadius: BorderRadius.circular(8.0)),
+        suffixIcon: IconButton(
+          icon: Icon(obscure ? Icons.visibility_off : Icons.visibility),
+          onPressed: toggle,
+        ),
+      ),
     );
   }
 }
