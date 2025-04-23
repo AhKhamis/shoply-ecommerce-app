@@ -10,7 +10,6 @@ class AdminCreateShopPage extends StatefulWidget {
 class _AdminCreateShopPageState extends State<AdminCreateShopPage> {
   final FocusNode _nameFocus = FocusNode();
   final FocusNode _descFocus = FocusNode();
-  final FocusNode _bgFocus = FocusNode();
 
   @override
   Widget build(BuildContext context) {

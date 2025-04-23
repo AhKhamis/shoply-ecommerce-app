@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:shoply/registration/signin_page.dart';
+import 'package:shoply/registration/user_type_page.dart';
 
 class WelcomePage extends StatefulWidget {
   const WelcomePage({super.key});
@@ -9,7 +9,7 @@ class WelcomePage extends StatefulWidget {
 }
 
 class _WelcomePageState extends State<WelcomePage> {
-  int currentPage = 0; // To track the current page index
+  int currentPage = 0;
 
   final List<Map<String, String>> pages = [
     {
@@ -46,7 +46,7 @@ class _WelcomePageState extends State<WelcomePage> {
     } else {
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => const SigninPage()),
+        MaterialPageRoute(builder: (context) => const UserTypePage()),
       );
     }
   }
@@ -54,7 +54,7 @@ class _WelcomePageState extends State<WelcomePage> {
   void skip() {
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(builder: (context) => const SigninPage()),
+      MaterialPageRoute(builder: (context) => const UserTypePage()),
     );
   }
 
@@ -81,7 +81,7 @@ class _WelcomePageState extends State<WelcomePage> {
                       children: [
                         Image.asset(
                           pages[currentPage]["image"]!,
-                          width: 200, // Adjust the size of the image
+                          width: 200,
                           height: 200,
                           fit: BoxFit.contain,
                         ),
@@ -125,8 +125,8 @@ class _WelcomePageState extends State<WelcomePage> {
                       height: 8,
                       decoration: BoxDecoration(
                         color: currentPage == index
-                            ? const Color(0xFF267093) // Active dot color
-                            : Colors.grey, // Inactive dot color
+                            ? const Color(0xFF267093)
+                            : Colors.grey,
                         borderRadius: BorderRadius.circular(4),
                       ),
                     ),
@@ -138,31 +138,28 @@ class _WelcomePageState extends State<WelcomePage> {
                   child: Row(
                     children: [
                       if (currentPage != pages.length - 1)
-                        if (currentPage != pages.length - 1)
-                          Expanded(
-                            child: TextButton(
-                              onPressed: skip,
-                              style: TextButton.styleFrom(
-                                padding:
-                                    const EdgeInsets.symmetric(vertical: 18),
-                                foregroundColor: Colors.black, // Text color
-                              ),
-                              child: const Text(
-                                "Skip",
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                        Expanded(
+                          child: TextButton(
+                            onPressed: skip,
+                            style: TextButton.styleFrom(
+                              padding: const EdgeInsets.symmetric(vertical: 18),
+                              foregroundColor: Colors.black,
+                            ),
+                            child: const Text(
+                              "Skip",
+                              style: TextStyle(
+                                fontSize: 16,
+                                fontWeight: FontWeight.bold,
                               ),
                             ),
                           ),
+                        ),
                       const SizedBox(width: 16),
                       Expanded(
                         child: AnimatedContainer(
-                          duration: const Duration(
-                              milliseconds: 800), // Slower animation
-                          curve: Curves.easeInOut, // Smooth easing curve
-                          height: 50, // Fixed height for all buttons
+                          duration: const Duration(milliseconds: 800),
+                          curve: Curves.easeInOut,
+                          height: 50,
                           child: ElevatedButton(
                             onPressed: navigateToNextPage,
                             style: ElevatedButton.styleFrom(

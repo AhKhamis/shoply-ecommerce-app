@@ -1,141 +1,183 @@
 import 'package:flutter/material.dart';
-import 'package:shoply/app_pages/admin_page/admin_users_page.dart';
+import 'admin_pass_page.dart';
+import 'signup_page.dart';
+import 'signin_page.dart';
 
-class AdminPassPage extends StatefulWidget {
-  const AdminPassPage({super.key});
+class UserTypePage extends StatefulWidget {
+  const UserTypePage({super.key});
 
   @override
-  State<AdminPassPage> createState() => _AdminPassPageState();
+  State<UserTypePage> createState() => _UserTypePageState();
 }
 
-class _AdminPassPageState extends State<AdminPassPage> {
-  final TextEditingController _controller = TextEditingController();
-  final FocusNode _focusNode = FocusNode();
-  bool _showError = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _focusNode.addListener(() => setState(() {}));
-  }
-
-  @override
-  void dispose() {
-    _controller.dispose();
-    _focusNode.dispose();
-    super.dispose();
-  }
-
-  void _validatePasscode() {
-    if (_controller.text == '123456') {
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const AdminUsersPage()),
-      );
-    } else {
-      setState(() => _showError = true);
-    }
-  }
+class _UserTypePageState extends State<UserTypePage> {
+  String? selectedType;
 
   @override
   Widget build(BuildContext context) {
-    bool isValid = _controller.text.length == 6;
-
     return Scaffold(
-      appBar: AppBar(
-        leading: IconButton(
-          icon: const Icon(Icons.arrow_back, color: Colors.black),
-          onPressed: () => Navigator.pop(context),
-        ),
-        backgroundColor: Colors.white,
-        elevation: 0,
-        title: ShaderMask(
-          shaderCallback: (Rect bounds) {
-            return const LinearGradient(
-              colors: [Color.fromARGB(255, 37, 124, 167), Color(0xFF1A4C64)],
-              begin: Alignment.topCenter,
-              end: Alignment.bottomCenter,
-            ).createShader(bounds);
-          },
-          child: const Text(
-            'Shoply',
-            style: TextStyle(
-              fontSize: 20,
-              fontWeight: FontWeight.bold,
-              color: Colors.white,
-            ),
-          ),
-        ),
-        centerTitle: false,
-      ),
-      body: Padding(
-        padding: const EdgeInsets.symmetric(horizontal: 24.0),
+      backgroundColor: const Color(0xFFF2F6FD),
+      body: SafeArea(
         child: Column(
           children: [
-            const Spacer(),
-            const Text(
-              'Admin Access',
-              style: TextStyle(
-                fontSize: 20,
-                fontWeight: FontWeight.bold,
-                color: Colors.black,
-              ),
-            ),
-            const SizedBox(height: 8),
-            const Text(
-              'Please enter your admin passcode to proceed',
-              textAlign: TextAlign.center,
-              style: TextStyle(fontSize: 14, color: Colors.grey),
-            ),
-            const SizedBox(height: 32),
-            TextField(
-              controller: _controller,
-              focusNode: _focusNode,
-              maxLength: 6,
-              keyboardType: TextInputType.number,
-              obscureText: true,
-              decoration: InputDecoration(
-                counterText: '',
-                contentPadding: const EdgeInsets.symmetric(vertical: 18),
-                prefixIcon: Icon(
-                  Icons.lock_outline,
-                  color: _focusNode.hasFocus ? Colors.black : Colors.grey,
-                ),
-                hintText: 'Enter 6-digit code',
-                hintStyle: const TextStyle(fontSize: 14, color: Colors.grey),
-                enabledBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: const BorderSide(color: Colors.grey),
-                ),
-                focusedBorder: OutlineInputBorder(
-                  borderRadius: BorderRadius.circular(8.0),
-                  borderSide: const BorderSide(color: Colors.black),
-                ),
-                errorText: _showError ? 'Passcode is incorrect' : null,
-              ),
-              onChanged: (_) => setState(() {
-                _showError = false;
-              }),
-            ),
-            const Spacer(),
-            SizedBox(
-              width: double.infinity,
-              child: ElevatedButton(
-                onPressed: isValid ? _validatePasscode : null,
-                style: ElevatedButton.styleFrom(
-                  backgroundColor: const Color(0xFF267093),
-                  minimumSize: const Size(double.infinity, 58),
-                  shape: RoundedRectangleBorder(
-                    borderRadius: BorderRadius.circular(8.0),
-                  ),
-                ),
-                child: const Text(
-                  'Enter Admin Panel',
-                  style: TextStyle(color: Colors.white, fontSize: 14),
+            const SizedBox(height: 24),
+            ShaderMask(
+              shaderCallback: (bounds) {
+                return const LinearGradient(
+                  colors: [Color(0xFF257CA7), Color(0xFF1A4C64)],
+                  begin: Alignment.topCenter,
+                  end: Alignment.bottomCenter,
+                ).createShader(bounds);
+              },
+              child: const Text(
+                'Shoply',
+                style: TextStyle(
+                  fontSize: 24,
+                  fontWeight: FontWeight.bold,
+                  color: Colors.white,
                 ),
               ),
             ),
             const SizedBox(height: 24),
+            Expanded(
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  const Text(
+                    'Who are you?',
+                    style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  ),
+                  const SizedBox(height: 24),
+                  Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                    children: [
+                      _buildTypeBox(
+                        type: 'user',
+                        icon: Icons.person_outline,
+                        label: 'User',
+                      ),
+                      _buildTypeBox(
+                        type: 'shop',
+                        icon: Icons.storefront_outlined,
+                        label: 'Shop',
+                      ),
+                    ],
+                  ),
+                  const SizedBox(height: 24),
+                  const Text(
+                    'And if you are admin',
+                    style: TextStyle(fontSize: 14, color: Colors.black54),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                            builder: (_) => const AdminPassPage()),
+                      );
+                    },
+                    child: const Text(
+                      'Sign in as an admin',
+                      style: TextStyle(
+                        color: Color(0xFF1A4C64),
+                        fontWeight: FontWeight.bold,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                  TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => const SigninPage()),
+                      );
+                    },
+                    child: const Text(
+                      'Already have an account? Sign in',
+                      style: TextStyle(
+                        color: Colors.blueAccent,
+                        fontSize: 14,
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 24),
+              child: SizedBox(
+                width: double.infinity,
+                height: 50,
+                child: ElevatedButton(
+                  onPressed: selectedType == null
+                      ? null
+                      : () {
+                          Navigator.push(
+                            context,
+                            MaterialPageRoute(
+                              builder: (_) =>
+                                  SignupPage(selectedRole: selectedType!),
+                            ),
+                          );
+                        },
+                  style: ElevatedButton.styleFrom(
+                    backgroundColor: const Color(0xFF1A4C64),
+                    foregroundColor: Colors.white,
+                    shape: RoundedRectangleBorder(
+                      borderRadius: BorderRadius.circular(12),
+                    ),
+                  ),
+                  child: const Text(
+                    'Continue',
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.bold,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
+  Widget _buildTypeBox({
+    required String type,
+    required IconData icon,
+    required String label,
+  }) {
+    final isSelected = selectedType == type;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedType = type;
+        });
+      },
+      child: Container(
+        width: 140,
+        height: 140,
+        decoration: BoxDecoration(
+          color: Colors.transparent,
+          border: Border.all(
+            color: isSelected ? const Color(0xFF267093) : Colors.grey.shade300,
+            width: 2,
+          ),
+          borderRadius: BorderRadius.circular(16),
+        ),
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Icon(icon, size: 40, color: Colors.black),
+            const SizedBox(height: 12),
+            Text(
+              label,
+              style: const TextStyle(
+                fontSize: 16,
+                fontWeight: FontWeight.w600,
+              ),
+            )
           ],
         ),
       ),
