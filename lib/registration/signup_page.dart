@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'signin_page.dart';
 
 class SignupPage extends StatefulWidget {
-  const SignupPage({super.key});
+  final String selectedRole;
+
+  const SignupPage({super.key, required this.selectedRole});
 
   @override
   _SignupPageState createState() => _SignupPageState();
@@ -16,13 +19,18 @@ class _SignupPageState extends State<SignupPage> {
 
   final _auth = FirebaseAuth.instance;
   final _formKey = GlobalKey<FormState>();
+  late String _selectedRole;
 
   final _fullNameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   final _confirmPasswordController = TextEditingController();
 
-  String? _confirmPasswordError;
+  @override
+  void initState() {
+    super.initState();
+    _selectedRole = widget.selectedRole;
+  }
 
   @override
   void dispose() {
@@ -81,10 +89,20 @@ class _SignupPageState extends State<SignupPage> {
     if (!_formKey.currentState!.validate()) return;
 
     try {
-      await _auth.createUserWithEmailAndPassword(
+      final userCredential = await _auth.createUserWithEmailAndPassword(
         email: _emailController.text.trim(),
         password: _passwordController.text.trim(),
       );
+
+      final uid = userCredential.user!.uid;
+
+      // Save extra info to Firestore
+      await FirebaseFirestore.instance.collection('users').doc(uid).set({
+        'fullname': _fullNameController.text.trim(),
+        'email': _emailController.text.trim(),
+        'role': _selectedRole,
+      });
+
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Sign up successful!")),
       );

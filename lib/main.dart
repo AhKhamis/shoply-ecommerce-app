@@ -4,7 +4,8 @@ import 'firebase_options.dart';
 import 'package:shoply/app_pages/home_page.dart';
 import 'package:shoply/app_pages/search_page.dart';
 import 'package:shoply/app_pages/orders_page.dart';
-import 'package:shoply/registration/signup_page.dart';
+import 'package:shoply/registration/signin_page.dart';
+import 'package:shoply/welcome_pages/welcome_page.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -25,7 +26,7 @@ class MyApp extends StatelessWidget {
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
       ),
-      home: SignupPage(),
+      home: WelcomePage(),
       debugShowCheckedModeBanner: false,
     );
   }
